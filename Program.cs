@@ -1,4 +1,4 @@
-﻿
+
 using System;
 using System.Diagnostics;
 using System.Linq;
@@ -9,22 +9,29 @@ namespace run_hidden
     {
         static void Main(string[] args)
         {
-            using (Process p = new Process())
-            {
-                p.StartInfo.UseShellExecute = false;
-                p.StartInfo.CreateNoWindow = true;
-                p.StartInfo.FileName = args[0];
+            if (args != null && args.Length != 0)
+             {
+                using (Process p = new Process())
+                {
+                    p.StartInfo.UseShellExecute = false;
+                    p.StartInfo.CreateNoWindow = true;
+                    p.StartInfo.FileName = Environment.ExpandEnvironmentVariables(args[0]);
 
-                args = args.Skip(1).ToArray();
+                    args = args.Skip(1).ToArray();
 
-                for (int i = 0; i < args.Length; i++)
-                    if (args[i].Contains(" "))
-                        args[i] = "\"" + args[i] + "\"";
+                    for (int i = 0; i < args.Length; i++)
+                    {
+                        args[i] = Environment.ExpandEnvironmentVariables(args[i]);
+                        if (args[i].Contains(" "))
+                        {
+                            args[i] = "\"" + args[i] + "\"";
+                        }
+                    }
 
-                p.StartInfo.Arguments = string.Join(" ", args);
-                p.Start();
-                p.WaitForExit();
-                Environment.ExitCode = p.ExitCode;
+                    p.StartInfo.Arguments = string.Join(" ", args);
+                    p.Start();
+                    Environment.ExitCode = 0;
+                }
             }
         }
     }
